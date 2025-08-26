@@ -1,4 +1,4 @@
-from fks_shared_python.utils import get_risk_threshold, enforce_risk
+from shared_python.utils import get_risk_threshold, enforce_risk
 
 
 def test_risk_threshold():

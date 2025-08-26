@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, UTC
 from jsonschema import validate
 
-from fks_shared_python.types import TradeSignal
+from shared_python.types import TradeSignal
 
 
 def test_trade_signal_schema_valid():
@@ -22,7 +22,7 @@ def test_trade_signal_schema_valid():
         symbol="AAPL",
         side="LONG",
         strength=0.5,
-        timestamp=datetime.utcnow(),
+    timestamp=datetime.now(UTC),
         strategy="mean_revert",
         meta={"source": "unit-test"},
     )

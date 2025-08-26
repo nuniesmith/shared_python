@@ -1,4 +1,4 @@
-from fks_shared_python.config import get_settings, reload_settings_cache
+from shared_python.config import get_settings, reload_settings_cache
 
 
 def test_settings_load():
