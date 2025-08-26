@@ -14,7 +14,6 @@ class TradeSignal(BaseModel):
     timestamp: datetime
     strategy: str
     meta: dict | None
-# <types:autogen end>
 
 
 class BaselineModelParams(BaseModel):
@@ -31,20 +30,12 @@ class BaselineModelParams(BaseModel):
     def effective_params(self) -> Dict[str, Any]:
         out = self.model_dump(exclude_none=True)
         mt = out.pop("model_type", "xgboost")
-        # Flatten extra
         extra = out.pop("extra", None) or {}
         return {"model_type": mt, **out, **extra}
 
-class RiskParams(BaseModel):
-    """Risk management parameter bundle.
 
-    max_risk_per_trade: fraction of equity (e.g. 0.01 for 1%)
-    target_vol: annualized target volatility (if using volatility targeting)
-    max_leverage: maximum leverage allowed
-    correlation_cap: max pairwise correlation before scaling down
-    confidence_floor: minimum confidence scaling factor when dynamic sizing
-    confidence_ceiling: maximum scaling factor for extremely confident signals
-    """
+class RiskParams(BaseModel):
+    """Risk management parameter bundle."""
     max_risk_per_trade: float = Field(gt=0, le=0.2, default=0.01)
     target_vol: float | None = Field(default=None, gt=0, le=2)
     max_leverage: float = Field(gt=0, le=50, default=5)
@@ -54,20 +45,13 @@ class RiskParams(BaseModel):
 
 
 class PositionSizingResult(BaseModel):
-    position_size: float  # nominal units (positive = long, negative = short)
+    position_size: float
     leverage: float
     method: Literal["kelly", "fractional", "vol_target", "correlation_adjusted", "composite"]
     meta: Dict[str, Any] | None = None
 
 
 class MarketBar(BaseModel):
-    """Canonical OHLCV bar (normalized adapter output).
-
-    ts: unix epoch seconds (int)
-    open/high/low/close: float prices
-    volume: float (can represent base asset units)
-    provider: optional source identifier
-    """
     ts: int = Field(ge=0)
     open: float
     high: float
@@ -77,7 +61,7 @@ class MarketBar(BaseModel):
     provider: Optional[str] = None
 
     @property
-    def ohlc_tuple(self) -> tuple[float, float, float, float]:  # convenience
+    def ohlc_tuple(self) -> tuple[float, float, float, float]:
         return (self.open, self.high, self.low, self.close)
 
 

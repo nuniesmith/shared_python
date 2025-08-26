@@ -1,39 +1,46 @@
-# shared_python
+# fks_shared_python (service‑agnostic utilities)
 
-Shared Python utilities for FKS services (config/env loading, logging helpers, risk calculations, hedging, shared domain types).
+Shared, reusable Python primitives for any FKS service (ingestion, training, inference, web, workers) without referencing concrete service packages. Keep this package lean and side‑effect free.
 
-## Features
+## Provided Modules
 
-- Centralized environment + .env loader (`config.load_config()`)
-- Lazy global settings object (`get_settings()`)
-- Structured logging setup (`init_logging()` / JSON via `FKS_JSON_LOGS=1`)
-- Shared exceptions (e.g. `RiskLimitExceeded`)
-- Risk + numeric helpers (`utils.py`)
-- Typed domain models via Pydantic (`types.py`)
-- Advanced position sizing & portfolio helpers (`risk.py`): Kelly, volatility targeting, correlation scaling, risk parity, hedged composite sizing.
-- Hedging utilities: regime uncertainty scoring + dynamic hedge overlay.
+| Area | Highlights |
+|------|------------|
+| config | `load_config()`, `get_settings()`, cached env+`.env` loader |
+| logging | `init_logging()` JSON or plain; `get_logger()` |
+| exceptions | `RiskLimitExceeded`, `DataFetchError`, `DataValidationError`, `ModelError` |
+| types | `TradeSignal`, `RiskParams`, `MarketBar`, etc. |
+| utils | Light preprocessing + feature helpers (z-score outliers, k-means 1D, cyclical encode) |
+| risk | Position sizing (Kelly, vol targeting, composite), ATR, portfolio (min variance, risk parity), hedging overlay |
+| metrics | Win rate, drawdown, Calmar, Sharpe/Sortino, CVaR, info ratio |
+| simulation | Slippage, GBM paths, Monte Carlo PnL, OOD score |
 
-## Install (as submodule path dependency)
+## Design Rules
+
+1. No imports from any `fks_*` service.
+2. Optional heavy deps are guarded (NumPy optional, falls back to pure Python).
+3. Deterministic, stateless helpers (except cached settings & logging init).
+4. Backwards compatibility: legacy alias `shared_python` may still work during migration; canonical namespace is `fks_shared_python`.
+
+## Install (editable) inside a service
+
+From a service root (example `fks_data/`):
 
 ```bash
-pip install -e repo/shared/python  # from service repo root
+pip install -e ../shared/shared_python
 ```
 
-Or if split into its own repository and added as git submodule under `shared/python`:
+Or add as git submodule first:
 
 ```bash
-git submodule add https://github.com/your-org/shared_python repo/shared/python
-pip install -e repo/shared/python
+git submodule add ../../shared/shared_python shared_python  # relative example
+pip install -e shared_python
 ```
 
-## Usage
+## Quick Usage
 
 ```python
-from fks_shared_python.config import get_settings  # new canonical namespace
-from fks_shared_python.risk import composite_with_hedge, RiskParams
-
-# Legacy alias still works:
-# from shared_python.config import get_settings
+from fks_shared_python import get_settings, RiskParams, composite_with_hedge
 
 settings = get_settings()
 params = RiskParams()
@@ -53,7 +60,13 @@ res = composite_with_hedge(
 print(res.position_size, res.meta["uncertainty_score"])
 ```
 
-## Environment Variables
+Enable structured JSON logs:
+
+```bash
+export FKS_JSON_LOGS=1
+```
+
+## Core Environment Variables
 
 | Var | Description | Default |
 |-----|-------------|---------|
@@ -62,15 +75,19 @@ print(res.position_size, res.meta["uncertainty_score"])
 | RISK_MAX_PER_TRADE | Fraction of equity per trade | 0.01 |
 | DEBUG_MODE | Extra debug toggles | false |
 
-Loads values from process env then optional `.env` (root search upward) using `python-dotenv`.
+Settings precedence: process env > nearest `.env` upward search > internal defaults.
 
-## Tests
+## Tests & Optional Extras
 
 ```bash
-pytest -q  # from project root after editable install
+pip install .[num]  # to enable numpy acceleration (optional)
+pytest -q
 ```
 
- 
+## Contributing
+
+Add only primitives used (or planned) across multiple services. If logic is niche to one service place it in that service repo instead.
+
 ## Versioning
 
-Tag releases (e.g. `v0.1.0`) in the standalone repo; services pin submodule commit hashes. Legacy import path `shared_python` retained for backward compatibility; plan migration to `fks_shared_python` only in next minor version.
+Tag releases (`v0.x.y`) and have services pin commit hashes or versions. Remove legacy `shared_python` alias when downstream imports fully migrated.

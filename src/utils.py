@@ -29,6 +29,37 @@ def enforce_risk(requested: float, equity: float | int) -> float:
     return requested
 
 
+from __future__ import annotations
+
+try:  # allow import whether loaded as package (relative) or top-level module
+    from .config import get_settings  # type: ignore
+    from .exceptions import RiskLimitExceeded, DataFetchError, DataValidationError  # type: ignore
+except ImportError:  # pragma: no cover
+    from config import get_settings  # type: ignore
+    from exceptions import RiskLimitExceeded, DataFetchError, DataValidationError  # type: ignore
+from typing import Sequence, List, Tuple
+import math
+
+try:  # Optional heavy deps
+    import numpy as _np  # type: ignore
+    import numpy.typing as _npt  # type: ignore
+except Exception:  # pragma: no cover
+    _np = None  # type: ignore
+    _npt = None  # type: ignore
+
+
+def get_risk_threshold(equity: float | int) -> float:
+    s = get_settings()
+    return float(equity) * float(s.RISK_MAX_PER_TRADE)
+
+
+def enforce_risk(requested: float, equity: float | int) -> float:
+    max_allowed = get_risk_threshold(equity)
+    if requested > max_allowed:
+        raise RiskLimitExceeded(requested=requested, max_allowed=max_allowed)
+    return requested
+
+
 # ---------------------------
 # Data preprocessing helpers
 # ---------------------------
@@ -128,6 +159,22 @@ def price_divergence(series_a: Sequence[float], series_b: Sequence[float]) -> fl
     return acc / len(series_a)
 
 
+def cyclical_encode(value: float, period: float) -> Tuple[float, float]:
+    if period <= 0:
+        raise DataValidationError("Period must be positive", {"period": period})
+    angle = (value % period) / period * 2 * math.pi
+    return math.sin(angle), math.cos(angle)
+
+
+__all__ = [
+    "get_risk_threshold",
+    "enforce_risk",
+    "zscore_outliers",
+    "kmeans_regimes",
+    "bid_ask_spread",
+    "price_divergence",
+    "cyclical_encode",
+]
 def cyclical_encode(value: float, period: float) -> Tuple[float, float]:
     if period <= 0:
         raise DataValidationError("Period must be positive", {"period": period})

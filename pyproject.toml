@@ -18,6 +18,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-cov", "mypy", "ruff"]
+num = ["numpy>=1.26"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

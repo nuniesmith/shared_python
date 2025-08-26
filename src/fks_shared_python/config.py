@@ -1,1 +1,0 @@
-from shared_python.config import *  # type: ignore  # noqa: F401,F403
