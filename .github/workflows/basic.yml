@@ -13,6 +13,8 @@ jobs:
       - name: Python lint (if requirements.txt)
         if: hashFiles('**/requirements.txt') != ''
         run: python -m py_compile $(git ls-files '*.py') || true
+      - name: Legacy import guard
+        run: python scripts/check_no_legacy_imports.py
       - name: Node check (if package.json)
         if: hashFiles('**/package.json') != ''
         run: node -v

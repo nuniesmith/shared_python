@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fks_shared_python"
-version = "0.1.0"
+version = "0.2.0"
 description = "FKS shared Python utilities: config/env loading, logging helpers, risk utils, shared types"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -25,6 +25,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 addopts = "-q"
+pythonpath = ["src"]
 
 [tool.mypy]
 python_version = "3.10"
