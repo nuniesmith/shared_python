@@ -91,3 +91,14 @@ Add only primitives used (or planned) across multiple services. If logic is nich
 ## Versioning
 
 Tag releases (`v0.x.y`) and have services pin commit hashes or versions. Remove legacy `shared_python` alias when downstream imports fully migrated.
+
+### 0.2.0 (current)
+
+- Introduced canonical package `fks_shared_python` (all core modules consolidated)
+- Legacy top-level duplicate modules replaced by thin wrappers
+- Removed accidental mid-file duplicate definitions causing SyntaxErrors
+- Added robust fallback to `zscore_outliers` (median/MAD) for single extreme detection
+- JSON logging now forces stdout handler reliably when `FKS_JSON_LOGS=1`
+- Backwards compatibility alias: `import shared_python` still works but will be deprecated; migrate to `fks_shared_python`.
+
+Planned removal of alias: earliest `0.4.0` (announce again in `0.3.x`).
