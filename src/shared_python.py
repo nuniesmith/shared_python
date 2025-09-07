@@ -1,32 +1,34 @@
-"""Service‑agnostic shared Python utilities.
+"""Flat aggregator module for shared utilities.
 
-This package MUST avoid referencing any concrete service names (fks_api, fks_data, etc.).
-Only generic domain concepts are exposed so any service (ingestion, training, web, batch)
-can depend on a stable surface.
+<<<<<<< HEAD:src/fks_shared_python/__init__.py
+Canonical import path: ``shared_python``.
+Legacy alias supported (deprecated): ``shared_python``.
+=======
+Import path stability: external projects can simply do::
 
-Public surface aggregated here for ergonomic imports:
+    import shared_python as sp
+    from shared_python import get_settings, TradeSignal
 
-from shared_python import get_settings, Trade, composite_position, RiskParams
-
-Add new exports ONLY if they are broadly reusable across >1 service.
+All underlying logic lives as sibling modules (config.py, types.py, etc.) so this
+file just re-exports a curated surface. Avoid service‑specific symbols here.
+>>>>>>> eb1dfce (chore: sync submodule):src/shared_python.py
 """
-
-from .config import load_config, get_settings, reload_settings_cache  # config
-from .logging import init_logging, get_logger  # logging
-from .exceptions import (
+from config import get_settings, reload_settings_cache, initialize_fks_service  # type: ignore
+from logging import init_logging, get_logger  # type: ignore
+from exceptions import (  # type: ignore
     RiskLimitExceeded,
     DataFetchError,
     DataValidationError,
     ModelError,
-)  # exceptions
-from .types import (
+)
+from types import (  # type: ignore
     TradeSignal,
     BaselineModelParams,
     RiskParams,
     PositionSizingResult,
     MarketBar,
-)  # types
-from .utils import (
+)
+from utils import (  # type: ignore
     get_risk_threshold,
     enforce_risk,
     zscore_outliers,
@@ -34,8 +36,8 @@ from .utils import (
     bid_ask_spread,
     price_divergence,
     cyclical_encode,
-)  # light utils
-from .risk import (
+)
+from risk import (  # type: ignore
     kelly_fraction,
     fractional_position,
     volatility_target_position,
@@ -49,8 +51,8 @@ from .risk import (
     regime_uncertainty_score,
     hedge_position_size,
     composite_with_hedge,
-)  # risk & portfolio
-from .metrics import (
+)
+from metrics import (  # type: ignore
     Trade,
     win_rate_with_costs,
     cumulative_equity,
@@ -61,20 +63,20 @@ from .metrics import (
     sharpe_ratio,
     downside_deviation,
     sortino_ratio,
-)  # metrics
-from .simulation import (
+)
+from simulation import (  # type: ignore
     apply_slippage,
     simulate_gbm,
     monte_carlo_pnl,
     ood_score,
-)  # simulation
-from .runtime import run_app, register_app, list_apps  # runtime (new)
+)
+from runtime import run_app, register_app, list_apps  # type: ignore
 
 __all__ = [
     # config
-    "load_config",
     "get_settings",
     "reload_settings_cache",
+    "initialize_fks_service",
     # logging
     "init_logging",
     "get_logger",
@@ -89,7 +91,7 @@ __all__ = [
     "RiskParams",
     "PositionSizingResult",
     "MarketBar",
-    # lightweight utils
+    # utils
     "get_risk_threshold",
     "enforce_risk",
     "zscore_outliers",
@@ -97,7 +99,7 @@ __all__ = [
     "bid_ask_spread",
     "price_divergence",
     "cyclical_encode",
-    # risk & portfolio
+    # risk
     "kelly_fraction",
     "fractional_position",
     "volatility_target_position",
@@ -132,4 +134,3 @@ __all__ = [
     "register_app",
     "list_apps",
 ]
-

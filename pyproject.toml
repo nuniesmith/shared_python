@@ -20,8 +20,12 @@ dependencies = [
 dev = ["pytest", "pytest-cov", "mypy", "ruff"]
 num = ["numpy>=1.26"]
 
+[project.scripts]
+fks-shared = "shared_python.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
+namespaces = false
 
 [tool.pytest.ini_options]
 addopts = "-q"
